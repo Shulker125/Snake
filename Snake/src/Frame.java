@@ -105,7 +105,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			head.direction = 2;
 			turn = false;
 		}
-	}
+	} 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
