@@ -22,7 +22,8 @@ import javax.swing.Timer;
 public class Frame extends JPanel implements ActionListener, MouseListener, KeyListener{
 	public boolean run = true;
 	Head head = new Head(80, 380);
-	Tail tail = new Tail(40, 380);
+	Tail tail1 = new Tail(40, 380);
+	ArrayList<Tail> tail = new ArrayList<>();
 	Apple apple = new Apple(520, 380);
 	Random rndX = new Random();
 	Random rndY = new Random();
@@ -48,6 +49,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		if (head.getX() == apple.getX()) {
 			if (head.getY() == apple.getY()) {
 				score++;
+				tail.add(new Tail(tail1.getX(), tail1.getY()));
 				apple.setX(possibleXY[0][randomX]);
 				apple.setY(possibleXY[1][randomY]);
 				while (apple.getX() == lastPosX && apple.getY() == lastPosY && countRun > 0) {
@@ -64,7 +66,10 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		}
 	    apple.paint(g);
 	    head.paint(g);
-	    tail.paint(g);
+	    for (int i = 0; i < tail.size(); i++) {
+	    	tail.get(i).paint(g);
+	    }
+	    tail1.paint(g);
 		
 	}
 	public static void main(String[] arg) {
@@ -89,6 +94,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
 		int key = e.getKeyCode();
+		// w = 87, a = 65, s = 83, d = 68
 		if (key == 87 && head.direction != 1 && turn && run) {
 			head.direction = 3;
 			turn = false;
@@ -158,7 +164,10 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		// TODO Auto-generated method stub
 		repaint();
 		head.move();
-		tail.move(head.direction);
+		tail1.move(head.direction);
+		for (int i = 0; i < tail.size(); i++) {
+			tail.get(i).move(tail1.getDir());
+		}
 		head.collisionCheck();
 		if (!head.run) {
 			run = false;
