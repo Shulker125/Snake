@@ -164,9 +164,14 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		// TODO Auto-generated method stub
 		repaint();
 		head.move();
-		tail1.move(head.direction);
+		tail1.moveMain(head.direction);
 		for (int i = 0; i < tail.size(); i++) {
-			tail.get(i).move(tail1.getDir());
+			if (i == 0) {
+				tail.get(i).move(tail1.getDir(), tail1.getX(), tail1.getY());
+			}
+			else {
+				tail.get(i).move(tail.get(i-1).getDir(), tail.get(i-1).getX(), tail.get(i-1).getY());
+			}
 		}
 		head.collisionCheck();
 		if (!head.run) {

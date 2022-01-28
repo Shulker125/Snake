@@ -6,7 +6,7 @@ public class Head {
 	private int v = 40;
 	public static boolean run = true;
 	public static int direction = 0;
-	Color newColor = new Color(0, 0, 0);
+	Color newColor = new Color(0, 0, 100);
 	public Head() {
 		x = 0;
 		y = 100;
