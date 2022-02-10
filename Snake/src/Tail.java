@@ -42,25 +42,25 @@ public class Tail {
 	}
 	public void move(int direction, int tailX, int tailY) {
 		if (direction == 0 && direction != 2 && Head.run) {
-			x = tailX-80;
+			x = tailX;
 			y = tailY;
 			this.direction = 0;
 			x += v;
 		}
 		else if (direction == 2 && direction !=0 && Head.run) {
-			x = tailX+80;
+			x = tailX;
 			y = tailY;
 			this.direction = 0;
 			x -= v;
 		}
 		else if (direction == 1 && direction != 3 && Head.run) {
-			y = tailY-80;
+			y = tailY;
 			x = tailX;
 			this.direction = 0;
 			y += v;
 		}
 		else if (direction == 3 && direction != 1 && Head.run) {
-			y = tailY+80;
+			y = tailY;
 			x = tailX;
 			this.direction = 0;
 			y -= v;

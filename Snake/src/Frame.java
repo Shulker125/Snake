@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import javax.swing.JButton;
@@ -27,9 +28,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	Apple apple = new Apple(520, 380);
 	Random rndX = new Random();
 	Random rndY = new Random();
-	public int x = 0;
-	public int y = 100;
-	public int score = 0; 
+	public int score = 0;
 	public int countRun = 0; 
 	public int lastPosX = apple.getX();
 	public int lastPosY = apple.getY();
@@ -94,6 +93,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
 		int key = e.getKeyCode();
+		
 		// w = 87, a = 65, s = 83, d = 68
 		if (key == 87 && head.direction != 1 && turn && run) {
 			head.direction = 3;
