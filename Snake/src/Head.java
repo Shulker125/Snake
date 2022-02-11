@@ -23,8 +23,8 @@ public class Head {
 	public void setY(int y) {
 		this.y = y;
 	}
-	public void paint(Graphics g) {
-		g.setColor(Color.green);
+	public void paint(Graphics g, Color c) {
+		g.setColor(c);
 		g.fillRect(x,  y, 40, 40);
 		
 	}
