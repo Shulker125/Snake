@@ -22,9 +22,7 @@ import javax.swing.Timer;
 
 public class Frame extends JPanel implements ActionListener, MouseListener, KeyListener{
 	public boolean run = true;
-	Head head = new Head(80, 380);
-	Tail tail1 = new Tail(40, 380);
-	ArrayList<Tail> tail = new ArrayList<>();
+	ArrayList<Head> head = new ArrayList<Head>();
 	Apple apple = new Apple(520, 380);
 	Random rndX = new Random();
 	Random rndY = new Random();
@@ -38,43 +36,46 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		int randomX = rndX.nextInt(16);
 		int randomY = rndY.nextInt(16);
 		super.paintComponent(g);
-		g.setFont(new Font("Arial", Font.PLAIN, 40));
+		for (int i = 0; i < head.size(); i++) {
+			if (head.get(i).getX() == apple.getX()) {
+				if (head.get(i).getY() == apple.getY()) {
+					score++;
+					head.add(new Head(getBackX(), getBackY()));
+					apple.setX(possibleXY[0][randomX]);
+					apple.setY(possibleXY[1][randomY]);
+					while (apple.getX() == lastPosX && apple.getY() == lastPosY && countRun > 0) {
+						randomX = rndX.nextInt(16);
+						randomY = rndY.nextInt(16);
+						apple.setX(possibleXY[0][randomX]);
+						apple.setY(possibleXY[1][randomY]);
+						
+					}
+					lastPosX = apple.getX();
+					lastPosY = apple.getY();
+					countRun++;
+				}
+			}
+		}
+	    apple.paint(g);
+	    for(int i = 0; i < head.size(); i++) {
+	    	head.get(i).paint(g);
+	    }
+	    g.setColor(Color.black);
+	    g.setFont(new Font("Arial", Font.PLAIN, 40));
 		g.drawRect(0, 100, 640, 640);
 		g.drawString("Score: "+score, 250, 80);
 		for (int i = 0, x = 40, y = 140; i < 15; i++, x+=40, y+=40) {
 			g.drawLine(x, 100, x, 740);
 			g.drawLine(0, y, 640, y);
 		}
-		if (head.getX() == apple.getX()) {
-			if (head.getY() == apple.getY()) {
-				score++;
-				tail.add(new Tail(tail1.getX(), tail1.getY()));
-				apple.setX(possibleXY[0][randomX]);
-				apple.setY(possibleXY[1][randomY]);
-				while (apple.getX() == lastPosX && apple.getY() == lastPosY && countRun > 0) {
-					randomX = rndX.nextInt(16);
-					randomY = rndY.nextInt(16);
-					apple.setX(possibleXY[0][randomX]);
-					apple.setY(possibleXY[1][randomY]);
-					
-				}
-				lastPosX = apple.getX();
-				lastPosY = apple.getY();
-				countRun++;
-			}
-		}
-	    apple.paint(g);
-	    head.paint(g);
-	    for (int i = 0; i < tail.size(); i++) {
-	    	tail.get(i).paint(g);
-	    }
-	    tail1.paint(g);
-		
 	}
 	public static void main(String[] arg) {
 		Frame f = new Frame();
+		
 ;	}
 	public Frame() {
+		head.add(new Head(80, 380));
+		head.add(new Head(40, 380));
 		JFrame f = new JFrame("Snake");
 		f.setSize(new Dimension(659, 788));
 		f.setBackground(Color.blue);
@@ -95,22 +96,25 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		int key = e.getKeyCode();
 		
 		// w = 87, a = 65, s = 83, d = 68
-		if (key == 87 && head.direction != 1 && turn && run) {
-			head.direction = 3;
-			turn = false;
+		for (Head h : head) {
+			if (key == 87 && h.direction != 1 && turn && run) {
+				h.direction = 3;
+				turn = false;
+			}
+			else if (key == 83 && h.direction != 3 && turn && run) {
+				h.direction = 1;
+				turn = false;
+			}
+			else if (key == 68 && h.direction != 2 && turn && run) {
+				h.direction = 0;
+				turn = false;
+			}
+			else if (key == 65 && h.direction != 0 && turn && run) {
+				h.direction = 2;
+				turn = false;
+			}
 		}
-		else if (key == 83 && head.direction != 3 && turn && run) {
-			head.direction = 1;
-			turn = false;
-		}
-		else if (key == 68 && head.direction != 2 && turn && run) {
-			head.direction = 0;
-			turn = false;
-		}
-		else if (key == 65 && head.direction != 0 && turn && run) {
-			head.direction = 2;
-			turn = false;
-		}
+		
 	} 
 	@Override
 	public void keyReleased(KeyEvent e) {
@@ -163,19 +167,54 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 		repaint();
-		head.move();
-		tail1.moveMain(head.direction);
-		for (int i = 0; i < tail.size(); i++) {
-			if (i == 0) {
-				tail.get(i).move(tail1.getDir(), tail1.getX(), tail1.getY());
-			}
-			else {
-				tail.get(i).move(tail.get(i-1).getDir(), tail.get(i-1).getX(), tail.get(i-1).getY());
+		head.get(head.size()-1).setX(getFrontX());
+		head.get(head.size()-1).setY(getFrontY());
+		head.add(0, head.remove(head.size()-1));
+		for (Head h : head) {
+			h.collisionCheck();
+			if (!h.run) {
+				run = false;
 			}
 		}
-		head.collisionCheck();
-		if (!head.run) {
-			run = false;
+		
+	}
+	public int getFrontX() {
+		if (head.get(0).direction == 0) {
+			return head.get(0).getX()+40;
 		}
+		else if (head.get(0).direction == 2){
+			return head.get(0).getX()-40;
+		}
+		return head.get(0).getX();
+	}
+	public int getFrontY() {
+		if (head.get(0).direction == 1) {
+			return head.get(0).getY()+40;
+		}
+		else if (head.get(0).direction == 3){
+			return head.get(0).getY()-40;
+		}
+		return head.get(0).getY();
+	}
+	//need to be coding differently, doesn't get the last tail direction properly
+	public int getBackX() {
+		int end = head.size()-1;
+		if (head.get(end).direction == 0) {
+			return head.get(end).getX()-40;
+		}
+		else if (head.get(end).direction == 2) {
+			return head.get(end).getX()+40;
+		}
+		return head.get(end).getX();
+	}
+	public int getBackY() {
+		int end = head.size()-1;
+		if (head.get(end).direction == 1) {
+			return head.get(end).getY()-40;
+		}
+		else if (head.get(end).direction == 3) {
+			return head.get(end).getY()+40;
+		}
+		return head.get(end).getY();
 	}
 }
