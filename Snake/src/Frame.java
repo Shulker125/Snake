@@ -33,27 +33,23 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public int lastPosY = apple.getY();
 	public int[][] possibleXY = {{0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600}, {100, 140, 180, 220, 260, 300, 340, 380, 420, 460, 500, 540, 580, 620, 660, 700}};
 	public boolean turn = true;
+	public boolean win = false;
 	public void paint(Graphics g) {
 		int randomX = rndX.nextInt(16);
 		int randomY = rndY.nextInt(16);
 		
 		super.paintComponent(g);
-		for (int i = 0; i < head.size(); i++) {
-			if (head.get(i).getX() == apple.getX()) {
-				if (head.get(i).getY() == apple.getY()) {
-					score++;
-					head.add(new Head(head.get(head.size()-1).getX(), head.get(head.size()-1).getY()));
-					apple.setX(possibleXY[0][randomX]);
-					apple.setY(possibleXY[1][randomY]);
-					moveApple(randomX, randomY);
-					lastPosX = apple.getX();
-					lastPosY = apple.getY();
-					countRun++;
+		if (head.get(1).getX() == apple.getX()) {
+			if (head.get(1).getY() == apple.getY()) {
+				score++;
+				head.add(new Head(head.get(head.size()-1).getX(), head.get(head.size()-1).getY()));
+				moveApple(randomX, randomY);
+				lastPosX = apple.getX();
+				lastPosY = apple.getY();
 				}
 			}
-		}
 	    apple.paint(g);
-	    for(int i = 0; i < head.size(); i++) {
+	    for(int i = head.size()-1; i >= 0; i--) {
 	    	if (i == 0) {
 	    		head.get(i).paint(g, Color.black);
 	    	}
@@ -65,6 +61,12 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	    	g.setColor(Color.black);
 	    	g.setFont(new Font("Arial", Font.PLAIN, 40));
 	    	g.drawString("Game Over!", 220, 375);
+	    }
+	    if (head.size() >= 257 && run) {
+	    	g.setColor(Color.black);
+	    	g.setFont(new Font("Arial", Font.PLAIN, 40));
+	    	g.drawString("You Win!", 220, 375);
+	    	win = true;
 	    }
 	    g.setColor(Color.black);
 	    g.setFont(new Font("Arial", Font.PLAIN, 40));
@@ -93,7 +95,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		f.setLayout(new GridLayout(1,2));
 		f.addMouseListener(this);
 		f.addKeyListener(this);
-		Timer t = new Timer(150, this);
+		Timer t = new Timer(50, this);
 		t.start();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
@@ -103,7 +105,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
 		int key = e.getKeyCode();
-		if (key == 32 && !run) {
+		if (key == 32 && !run || win) {
 			reset();
 		}
 		// w = 87, a = 65, s = 83, d = 68
@@ -141,7 +143,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getButton() == 1) {
-			for (int i = 0; i < 50; i++) {
+			for (int i = 0; i < 230; i++) {
 				head.add(new Head(head.get(head.size()-1).getX(), head.get(head.size()-1).getY()));
 			}
 			
@@ -172,15 +174,15 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		// TODO Auto-generated method stub
 		repaint();
 		
-		if (run) {
+		if (run && !win) {
 			head.get(head.size()-1).setX(getFrontX());
 			head.get(head.size()-1).setY(getFrontY());
 			head.add(0, head.remove(head.size()-1));
 			turn = true;
 		}
 		for (Head h : head) {
-			//h.collisionCheck();
-			//checkCollisionTail();
+			h.collisionCheck();
+			checkCollisionTail();
 			setFalse();
 			if (!h.run) {
 				run = false;
@@ -237,23 +239,30 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		apple.setX(520);
 		apple.setY(380);
 		run = true;
+		win = false;
 	}
 	public void moveApple(int randX, int randY) {
-		for (Head h : head) {
-			while ((h.getX() == apple.getX() && (h.getY() == apple.getY()))){
-				randX = rndX.nextInt(16);
-				randY = rndY.nextInt(16);
-				apple.setX(possibleXY[0][randX]);
-				apple.setY(possibleXY[1][randY]);
-			}
-			while (apple.getX() == lastPosX && apple.getY() == lastPosY && countRun > 0) {
-				randX = rndX.nextInt(16);
-				randY = rndY.nextInt(16);
-				apple.setX(possibleXY[0][randX]);
-				apple.setY(possibleXY[1][randY]);
-				
-			}
+		while ((isOnSnake() || isInSamePlace()) && !win){
+			randX = rndX.nextInt(16);
+			randY = rndY.nextInt(16);
+			apple.setX(possibleXY[0][randX]);
+			apple.setY(possibleXY[1][randY]);
 		}
 		
+	}
+	public boolean isOnSnake() {
+		for (int i = 1; i < head.size(); i++) {
+			if (head.get(i).getX() == apple.getX() && head.get(i).getY() == apple.getY()) {
+				return true;
+			}
+		}
+		return false;
+		
+	}
+	public boolean isInSamePlace() {
+		if (apple.getX() == lastPosX && apple.getY() == lastPosY) {
+			return true;
+		}
+		return false;
 	}
 }
