@@ -26,9 +26,12 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	Apple apple = new Apple(520, 380);
 	Random rndX = new Random();
 	Random rndY = new Random();
+	Timer t = new Timer(150, this);
 	public int score = 0;
 	public int countRun = 0; 
 	public int highscore = 0;
+	public int transparent = 0;
+	
 	public int lastPosX = apple.getX();
 	public int lastPosY = apple.getY();
 	public int[][] possibleXY = {{0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600}, {100, 140, 180, 220, 260, 300, 340, 380, 420, 460, 500, 540, 580, 620, 660, 700}};
@@ -37,7 +40,6 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void paint(Graphics g) {
 		int randomX = rndX.nextInt(16);
 		int randomY = rndY.nextInt(16);
-		
 		super.paintComponent(g);
 		if (head.get(1).getX() == apple.getX()) {
 			if (head.get(1).getY() == apple.getY()) {
@@ -58,9 +60,10 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	    	}
 	    }
 	    if (!run) {
-	    	g.setColor(Color.black);
-	    	g.setFont(new Font("Arial", Font.PLAIN, 40));
-	    	g.drawString("Game Over!", 220, 375);
+	    	gameOverDisplay(g);
+	    	if (transparent < 255) {
+				transparent += 15;
+			}
 	    }
 	    if (head.size() >= 257 && run) {
 	    	g.setColor(Color.black);
@@ -79,6 +82,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			g.drawLine(x, 100, x, 740);
 			g.drawLine(0, y, 640, y);
 		}
+		
 	}
 	public static void main(String[] arg) {
 		Frame f = new Frame();
@@ -95,7 +99,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		f.setLayout(new GridLayout(1,2));
 		f.addMouseListener(this);
 		f.addKeyListener(this);
-		Timer t = new Timer(150, this);
+		t.setDelay(150);
 		t.start();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
@@ -236,8 +240,10 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			h.run = true;
 			h.direction = 0;
 		}
+		transparent = 0;
 		apple.setX(520);
 		apple.setY(380);
+		t.setDelay(150);
 		run = true;
 		win = false;
 	}
@@ -264,5 +270,16 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			return true;
 		}
 		return false;
+	}
+	public void gameOverDisplay(Graphics g) {
+		t.setDelay(25);
+		Color c = new Color(150, 150, 150, transparent);
+		Color c2 = new Color(0, 0, 0, transparent);
+		g.setColor(c);
+		g.fillRect(220, 340, 220, 40);
+		g.setColor(c2);
+    	g.setFont(new Font("Arial", Font.PLAIN, 40));
+    	g.drawString("Game Over!", 220, 375);
+		
 	}
 }
