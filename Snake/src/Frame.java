@@ -95,7 +95,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		f.setLayout(new GridLayout(1,2));
 		f.addMouseListener(this);
 		f.addKeyListener(this);
-		Timer t = new Timer(50, this);
+		Timer t = new Timer(150, this);
 		t.start();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
