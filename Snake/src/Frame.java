@@ -109,9 +109,6 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
 		int key = e.getKeyCode();
-		if (key == 32 && !run || win) {
-			reset();
-		}
 		// w = 87, a = 65, s = 83, d = 68
 		for (Head h : head) {
 			if ((key == 87 || key == 38) && h.direction != 1 && turn && run) {
@@ -147,16 +144,24 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getButton() == 1) {
-			for (int i = 0; i < 230; i++) {
-				head.add(new Head(head.get(head.size()-1).getX(), head.get(head.size()-1).getY()));
+			System.out.println(e.getX() + "," + e.getY()); //320, 410
+		}
+		if (e.getButton() == 1 && !run || win) {
+			if (e.getX() >= 320 && e.getX() <= 360 && e.getY() >= 410 && e.getY() <= 450){
+				reset();
 			}
-			
+		}
+	}
+	public void mouseHover(MouseEvent e) {
+		if (!run || win) {
+			if (e.getX() >= 320 && e.getX() <= 360 && e.getY() >= 410 && e.getY() <= 450){
+				reset();
+			}
 		}
 	}
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
 	@Override
 	public void mouseExited(MouseEvent e) {
@@ -276,7 +281,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		Color c = new Color(150, 150, 150, transparent);
 		Color c2 = new Color(0, 0, 0, transparent);
 		g.setColor(c);
-		g.fillRect(220, 340, 220, 40);
+		g.fillRect(220, 340, 220, 80);
 		g.setColor(c2);
     	g.setFont(new Font("Arial", Font.PLAIN, 40));
     	g.drawString("Game Over!", 220, 375);
