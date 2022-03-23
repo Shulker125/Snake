@@ -11,6 +11,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -23,15 +25,17 @@ import javax.swing.Timer;
 public class Frame extends JPanel implements ActionListener, MouseListener, KeyListener{
 	public boolean run = true;
 	ArrayList<Head> head = new ArrayList<Head>();
+	JFrame f = new JFrame("Snake");
 	Apple apple = new Apple(520, 380);
 	Random rndX = new Random();
 	Random rndY = new Random();
 	Timer t = new Timer(150, this);
+	Point p = MouseInfo.getPointerInfo().getLocation();
+	public int transparent = 0;
+	Color c2 = new Color(0, 0, 0, transparent);
 	public int score = 0;
 	public int countRun = 0; 
 	public int highscore = 0;
-	public int transparent = 0;
-	
 	public int lastPosX = apple.getX();
 	public int lastPosY = apple.getY();
 	public int[][] possibleXY = {{0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600}, {100, 140, 180, 220, 260, 300, 340, 380, 420, 460, 500, 540, 580, 620, 660, 700}};
@@ -40,16 +44,11 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void paint(Graphics g) {
 		int randomX = rndX.nextInt(16);
 		int randomY = rndY.nextInt(16);
+		int winX = f.getX(), winY = f.getY();
+		p.x -= winX;
+		p.y -= winY;
 		super.paintComponent(g);
-		if (head.get(1).getX() == apple.getX()) {
-			if (head.get(1).getY() == apple.getY()) {
-				score++;
-				head.add(new Head(head.get(head.size()-1).getX(), head.get(head.size()-1).getY()));
-				moveApple(randomX, randomY);
-				lastPosX = apple.getX();
-				lastPosY = apple.getY();
-				}
-			}
+		collectApple(randomX, randomY);
 	    apple.paint(g);
 	    for(int i = head.size()-1; i >= 0; i--) {
 	    	if (i == 0) {
@@ -60,17 +59,12 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	    	}
 	    }
 	    if (!run) {
-	    	gameOverDisplay(g);
+	    	gameOverDisplay(g, new Color(0, 0, 0, transparent));
 	    	if (transparent < 255) {
 				transparent += 15;
 			}
 	    }
-	    if (head.size() >= 257 && run) {
-	    	g.setColor(Color.black);
-	    	g.setFont(new Font("Arial", Font.PLAIN, 40));
-	    	g.drawString("You Win!", 220, 375);
-	    	win = true;
-	    }
+	    paintWin(g);
 	    g.setColor(Color.black);
 	    g.setFont(new Font("Arial", Font.PLAIN, 40));
 		g.drawRect(0, 100, 640, 640);
@@ -82,16 +76,20 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			g.drawLine(x, 100, x, 740);
 			g.drawLine(0, y, 640, y);
 		}
-		
+		if (!run || win) {
+			if (p.getX() >= 200 && p.getX() <= 440 && p.getY() >= 370 && p.getY() <= 410){
+				gameOverDisplay(g, new Color(200, 34, 22, transparent));
+			}
+		}
+		p = MouseInfo.getPointerInfo().getLocation();
 	}
 	public static void main(String[] arg) {
 		Frame f = new Frame();
 		
-;	}
+	}
 	public Frame() {
 		head.add(new Head(80, 380));
 		head.add(new Head(40, 380));
-		JFrame f = new JFrame("Snake");
 		f.setSize(new Dimension(659, 788));
 		f.setBackground(Color.blue);
 		f.add(this);
@@ -147,14 +145,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			System.out.println(e.getX() + "," + e.getY()); //320, 410
 		}
 		if (e.getButton() == 1 && !run || win) {
-			if (e.getX() >= 320 && e.getX() <= 360 && e.getY() >= 410 && e.getY() <= 450){
-				reset();
-			}
-		}
-	}
-	public void mouseHover(MouseEvent e) {
-		if (!run || win) {
-			if (e.getX() >= 320 && e.getX() <= 360 && e.getY() >= 410 && e.getY() <= 450){
+			if (e.getX() >= 200 && e.getX() <= 440 && e.getY() >= 370 && e.getY() <= 410){
 				reset();
 			}
 		}
@@ -276,15 +267,34 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		}
 		return false;
 	}
-	public void gameOverDisplay(Graphics g) {
+	public void gameOverDisplay(Graphics g, Color newColor) {
 		t.setDelay(25);
 		Color c = new Color(150, 150, 150, transparent);
-		Color c2 = new Color(0, 0, 0, transparent);
+		c2 = newColor;
 		g.setColor(c);
-		g.fillRect(220, 340, 220, 80);
+		g.fillRect(200, 340, 240, 80);
 		g.setColor(c2);
     	g.setFont(new Font("Arial", Font.PLAIN, 40));
-    	g.drawString("Game Over!", 220, 375);
+    	g.drawString("Game Over!", 213, 375);
 		
+	}
+	public void collectApple(int x, int y) {
+		if (head.get(1).getX() == apple.getX()) {
+			if (head.get(1).getY() == apple.getY()) {
+				score++;
+				head.add(new Head(head.get(head.size()-1).getX(), head.get(head.size()-1).getY()));
+				moveApple(x, y);
+				lastPosX = apple.getX();
+				lastPosY = apple.getY();
+			}
+		}
+	}
+	public void paintWin(Graphics g) {
+		if (head.size() >= 257 && run) {
+	    	g.setColor(Color.black);
+	    	g.setFont(new Font("Arial", Font.PLAIN, 40));
+	    	g.drawString("You Win!", 220, 375);
+	    	win = true;
+	    }
 	}
 }
