@@ -58,12 +58,6 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	    		head.get(i).paint(g, Color.green);
 	    	}
 	    }
-	    if (!run) {
-	    	gameOverDisplay(g, new Color(0, 0, 0, transparent));
-	    	if (transparent < 255) {
-				transparent += 15;
-			}
-	    }
 	    paintWin(g);
 	    g.setColor(Color.black);
 	    g.setFont(new Font("Arial", Font.PLAIN, 40));
@@ -76,6 +70,12 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			g.drawLine(x, 100, x, 740);
 			g.drawLine(0, y, 640, y);
 		}
+		if (!run) {
+	    	gameOverDisplay(g, new Color(0, 0, 0, transparent));
+	    	if (transparent < 255) {
+				transparent += 15;
+			}
+	    }
 		if (!run || win) {
 			if (p.getX() >= 200 && p.getX() <= 440 && p.getY() >= 370 && p.getY() <= 410){
 				gameOverDisplay(g, new Color(200, 34, 22, transparent));
@@ -141,9 +141,6 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		if (e.getButton() == 1) {
-			System.out.println(e.getX() + "," + e.getY()); //320, 410
-		}
 		if (e.getButton() == 1 && !run || win) {
 			if (e.getX() >= 200 && e.getX() <= 440 && e.getY() >= 370 && e.getY() <= 410){
 				reset();
